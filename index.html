@@ -3,84 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IPA Science Gallery | Pasilyo Edition</title>
+    <title>Genius Society Research Log</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #52b788; --secondary: #b7e4c7; --dark: #1b4332; --bg: #f7fff7; }
-        body { margin: 0; font-family: 'Quicksand', sans-serif; background-color: var(--bg); overflow-x: hidden; }
+        :root {
+            --herta-purple: #b39ddb;
+            --ruan-green: #4db6ac;
+            --dark-space: #1a1a2e;
+            --soft-bg: #f3e5f5;
+            --white: #ffffff;
+        }
 
-        /* --- LOADING SCREEN --- */
-        #loader { position: fixed; inset: 0; background: white; z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .science-icon { width: 80px; height: 80px; border: 6px solid var(--secondary); border-top: 6px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        * { box-sizing: border-box; transition: all 0.3s ease; }
+        body { 
+            margin: 0; font-family: 'Quicksand', sans-serif; 
+            background: var(--soft-bg); color: var(--dark-space);
+            overflow-x: hidden;
+        }
+
+        /* --- BACKGROUND --- */
+        .bg-pattern {
+            position: fixed; inset: 0; z-index: -1; opacity: 0.2;
+            background-image: url('https://www.transparenttextures.com/patterns/mi-cha.png');
+        }
+
+        /* --- LOADING --- */
+        #loader {
+            position: fixed; inset: 0; background: var(--white); z-index: 10000;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .atom-spinner {
+            width: 60px; height: 60px; border: 5px solid var(--herta-purple);
+            border-top: 5px solid var(--ruan-green); border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* --- LANDING PAGE --- */
-        #landing-page { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
-        .welcome-text { font-size: 2.5rem; font-weight: 700; color: var(--primary); margin-bottom: 10px; }
-        .btn-mapel { padding: 18px 35px; font-size: 1rem; font-weight: 700; border: none; border-radius: 20px; background: white; color: var(--primary); cursor: pointer; transition: 0.3s; box-shadow: 0 10px 20px rgba(82, 183, 136, 0.2); margin: 10px; }
-        .btn-mapel:hover { transform: translateY(-5px); background: var(--primary); color: white; }
-
-        /* --- MAIN APP --- */
-        #main-app { display: none; }
-        .running-text { background: var(--dark); color: white; padding: 10px 0; font-size: 0.85rem; font-weight: 600; }
-        header { text-align: center; padding: 40px 20px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; padding: 0 40px 60px; max-width: 1600px; margin: auto; }
-        .card { background: white; border-radius: 25px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.02); transition: 0.4s; }
-        .card:hover { transform: scale(1.02); }
-        .card img { width: 100%; height: 220px; object-fit: cover; }
-        .card-content { padding: 20px; }
-
-        /* --- MUSIC CONTROLLER --- */
-        #music-control {
-            position: fixed; bottom: 25px; right: 25px; z-index: 9999;
-            background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(5px);
-            padding: 12px; border-radius: 50%; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            transition: 0.3s; border: 2px solid var(--primary);
+        /* --- NAVIGATION WRAPPER --- */
+        .page-section { 
+            min-height: 100vh; display: none; flex-direction: column; 
+            align-items: center; justify-content: center; padding: 40px 20px; 
         }
-        #music-control:hover { transform: scale(1.1); background: white; }
+        .page-active { display: flex; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- TYPOGRAPHY --- */
+        h1 { font-weight: 700; font-size: 2.5rem; text-align: center; color: var(--ruan-green); margin-bottom: 10px; }
+        .quote { font-style: italic; opacity: 0.7; text-align: center; max-width: 600px; margin-bottom: 40px; line-height: 1.6; }
+
+        /* --- BUTTONS & INPUTS --- */
+        .btn-grid { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; }
+        .choice-btn {
+            padding: 15px 35px; border: none; border-radius: 30px; 
+            background: var(--white); color: var(--dark-space);
+            font-weight: 700; cursor: pointer; font-family: 'Quicksand';
+            box-shadow: 0 8px 15px rgba(0,0,0,0.05);
+        }
+        .choice-btn:hover { 
+            background: var(--ruan-green); color: white; transform: scale(1.05);
+            box-shadow: 0 12px 20px rgba(77, 182, 172, 0.3);
+        }
+        .back-link { margin-top: 30px; cursor: pointer; font-weight: 600; opacity: 0.6; text-decoration: underline; }
+
+        /* --- GALLERY --- */
+        .marquee-box { width: 100%; background: var(--dark-space); color: var(--herta-purple); padding: 10px 0; font-weight: 600; font-size: 0.8rem; }
+        .grid { 
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+            gap: 25px; width: 100%; max-width: 1400px; margin-top: 30px;
+        }
+        .card { 
+            background: var(--white); border-radius: 35px; overflow: hidden; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.03); 
+        }
+        .card img { width: 100%; height: 200px; object-fit: cover; }
+        .card-body { padding: 25px; }
+        .card-tag { font-size: 0.65rem; font-weight: 700; color: var(--herta-purple); text-transform: uppercase; }
+
+        #music-control {
+            position: fixed; bottom: 20px; left: 20px; z-index: 9999;
+            background: var(--white); border-radius: 50px; padding: 10px 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); cursor: pointer; font-weight: 700;
+        }
     </style>
 </head>
 <body>
 
-    <audio id="bgm" loop>
-        <source src="pasilyo.mp3" type="audio/mpeg">
-    </audio>
-
-    <div id="music-control" onclick="toggleMusic()" style="display: none;">
-        <span id="music-icon" style="font-size: 1.5rem;">🔊</span>
-    </div>
+    <div class="bg-pattern"></div>
+    <audio id="bgm" loop><source src="pasilyo.mp3" type="audio/mpeg"></audio>
 
     <div id="loader">
-        <div class="science-icon"></div>
-        <p style="margin-top:15px; font-weight:700; color:var(--primary)">Preparing your journey...</p>
+        <div class="atom-spinner"></div>
+        <p style="margin-top: 15px; font-weight: 700; color: var(--ruan-green);">Synchronizing Neural Link...</p>
     </div>
 
-    <div id="landing-page">
-        <div class="welcome-text">Science Gallery Explorer</div>
-        <p style="opacity: 0.7; margin-bottom: 30px;">"Panalangin ko sa habang buhay..."</p>
-        <div class="mapel-buttons">
-            <button class="btn-mapel" onclick="startApp('Biologi')">🌿 Biologi</button>
-            <button class="btn-mapel" onclick="startApp('Fisika')">⚡ Fisika</button>
-            <button class="btn-mapel" onclick="startApp('Kimia')">🧪 Kimia</button>
+    <section id="step-mapel" class="page-section page-active">
+        <h1>Genius Society Log</h1>
+        <p class="quote">"It's a wonder how life, in all its forms, finds its way to survive. I simply wish to understand its essence." — Ruan Mei</p>
+        <div class="btn-grid">
+            <button class="choice-btn" onclick="setMapel('Biologi')">🌿 Biologi</button>
+            <button class="choice-btn" onclick="setMapel('Fisika')">⚡ Fisika</button>
+            <button class="choice-btn" onclick="setMapel('Kimia')">🧪 Kimia</button>
         </div>
-    </div>
+    </section>
 
-    <div id="main-app">
-        <div class="running-text">
-            <marquee id="marquee-text">Loading statistics...</marquee>
+    <section id="step-kelas" class="page-section">
+        <h1 id="title-kelas">Select Grade</h1>
+        <p class="quote">"Research requires patience. Every stage of growth is a data point worth observing."</p>
+        <div class="btn-grid">
+            <button class="choice-btn" onclick="setKelas('10')">Grade 10</button>
+            <button class="choice-btn" onclick="setKelas('11')">Grade 11</button>
+            <button class="choice-btn" onclick="setKelas('12')">Grade 12</button>
         </div>
-        <header>
-            <p onclick="goBack()" style="cursor:pointer; color:var(--primary); font-weight:700;">← Kembali</p>
-            <h1 id="title-mapel" style="font-size: 3rem; margin: 5px 0;">Biologi</h1>
-        </header>
-        <div class="grid" id="gallery"></div>
-    </div>
+        <span class="back-link" onclick="navTo('step-mapel')">Change Subject</span>
+    </section>
+
+    <section id="step-smt" class="page-section">
+        <h1 id="title-smt">Select Period</h1>
+        <div class="btn-grid">
+            <button class="choice-btn" onclick="renderFinal('1')">Semester 1</button>
+            <button class="choice-btn" onclick="renderFinal('2')">Semester 2</button>
+        </div>
+        <span class="back-link" onclick="navTo('step-kelas')">Change Grade</span>
+    </section>
+
+    <section id="step-gallery" class="page-section" style="justify-content: flex-start;">
+        <div class="marquee-box"><marquee id="marquee-text"></marquee></div>
+        <h1 id="title-final" style="margin-top: 40px;">Research Results</h1>
+        <span class="back-link" onclick="navTo('step-smt')">← Back to Filter</span>
+        <div class="grid" id="gallery-grid"></div>
+    </section>
+
+    <div id="music-control" onclick="toggleMusic()">🎵 Background: On</div>
 
     <script>
         const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRyJ4VihwGxpbpxQfSDKMb5AiPVmY1-wFviOWyEjfsuljcLPXUypWMNVDakdmM-58m31gNBNydwGSEe/pub?output=csv";
         let db = [];
-        let activeMapel = "";
+        let selection = { mapel: '', kelas: '', smt: '' };
         const music = document.getElementById('bgm');
 
         async function init() {
@@ -92,57 +150,54 @@
                     const c = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
                     return { kelas: c[0]?.trim(), mapel: c[1]?.trim(), smt: c[2]?.trim(), judul: c[3]?.trim(), link: c[4]?.trim(), desc: c[5]?.trim() };
                 }).filter(x => x.judul);
-
-                document.getElementById('marquee-text').innerText = `Total Karya Terdata: ${db.length} Project • Menjelajahi indahnya sains ditemani Pasilyo...`;
-                setTimeout(() => { document.getElementById('loader').style.opacity = '0'; setTimeout(()=> document.getElementById('loader').style.display='none', 800); }, 2000);
-            } catch (e) { console.error(e); }
+                document.getElementById('marquee-text').innerText = `Data detected: ${db.length} Subjects analyzed. Laboratory status: Operational. Background melody active.`;
+                setTimeout(() => document.getElementById('loader').style.display='none', 1500);
+            } catch (e) { alert("Neural link failed."); }
         }
 
-        function startApp(mapel) {
-            // PLAY MUSIC
-            music.volume = 0.4;
-            music.play().catch(e => console.log("Autoplay blocked, waiting for interaction"));
+        function navTo(id) {
+            document.querySelectorAll('.page-section').forEach(s => s.classList.remove('page-active'));
+            document.getElementById(id).classList.add('page-active');
+        }
+
+        function setMapel(m) {
+            selection.mapel = m;
+            document.getElementById('title-kelas').innerText = m + " Research";
+            if(music.paused) { music.volume = 0.3; music.play(); }
+            navTo('step-kelas');
+        }
+
+        function setKelas(k) {
+            selection.kelas = k;
+            document.getElementById('title-smt').innerText = `${selection.mapel} - Grade ${k}`;
+            navTo('step-smt');
+        }
+
+        function renderFinal(s) {
+            selection.smt = s;
+            document.getElementById('title-final').innerText = `${selection.mapel} Grade ${selection.kelas}`;
+            const filtered = db.filter(d => d.mapel === selection.mapel && d.kelas === selection.kelas && d.smt === s);
             
-            document.getElementById('music-control').style.display = 'flex';
-            document.getElementById('title-mapel').innerText = mapel;
-            document.getElementById('landing-page').style.display = 'none';
-            document.getElementById('main-app').style.display = 'block';
-            activeMapel = mapel;
-            render();
+            const grid = document.getElementById('gallery-grid');
+            grid.innerHTML = filtered.length ? '' : '<p>No specimen found in this sector.</p>';
+            
+            filtered.forEach(item => {
+                grid.innerHTML += `
+                    <div class="card">
+                        <img src="${item.link}" onerror="this.src='https://via.placeholder.com/400x250?text=No+Data'">
+                        <div class="card-body">
+                            <span class="card-tag">Period ${item.smt}</span>
+                            <div style="font-weight:700; font-size:1.4rem; margin:10px 0;">${item.judul}</div>
+                            <p style="font-size:0.85rem; opacity:0.7;">${item.desc}</p>
+                        </div>
+                    </div>`;
+            });
+            navTo('step-gallery');
         }
 
         function toggleMusic() {
-            const icon = document.getElementById('music-icon');
-            if (music.muted) {
-                music.muted = false;
-                icon.innerText = "🔊";
-            } else {
-                music.muted = true;
-                icon.innerText = "🔇";
-            }
-        }
-
-        function goBack() {
-            document.getElementById('landing-page').style.display = 'flex';
-            document.getElementById('main-app').style.display = 'none';
-            document.getElementById('music-control').style.display = 'none';
-            music.pause();
-            music.currentTime = 0;
-        }
-
-        function render() {
-            const cont = document.getElementById('gallery');
-            const filtered = db.filter(d => d.mapel === activeMapel);
-            cont.innerHTML = filtered.map(item => `
-                <div class="card">
-                    <img src="${item.link}" onerror="this.src='https://via.placeholder.com/400x250?text=IPA+Project'">
-                    <div class="card-content">
-                        <span style="font-size:0.7rem; font-weight:700; color:var(--primary)">KELAS ${item.kelas} • SMT ${item.smt}</span>
-                        <div style="font-size:1.3rem; font-weight:700; margin:10px 0;">${item.judul}</div>
-                        <p style="font-size:0.85rem; opacity:0.7;">${item.desc}</p>
-                    </div>
-                </div>
-            `).join('');
+            music.muted = !music.muted;
+            document.getElementById('music-control').innerText = music.muted ? "🎵 Background: Off" : "🎵 Background: On";
         }
 
         window.onload = init;
