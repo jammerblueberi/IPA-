@@ -57,54 +57,50 @@
 
         .back-link { margin-top: 30px; cursor: pointer; font-weight: 700; color: var(--herta-dark); text-decoration: underline; opacity: 0.7; }
 
-        /* --- RUNNING TEXT (ANTI-MACET) --- */
+        /* --- RUNNING TEXT CSS ANIMATION --- */
         .marquee-wrap {
             width: 100%; background: var(--herta-dark); color: white;
-            padding: 12px 0; overflow: hidden; white-space: nowrap;
-            position: relative;
+            padding: 15px 0; overflow: hidden; white-space: nowrap;
         }
         .marquee-content {
             display: inline-block;
-            padding-left: 100%;
-            animation: jalanTerus 25s linear infinite;
+            animation: jalanTerus 20s linear infinite;
             font-weight: 600;
+            padding-left: 100%;
         }
         @keyframes jalanTerus {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(-100%, 0); }
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
         }
 
-        /* --- GALLERY & ZOOM FEATURE --- */
+        /* --- GALLERY & ZOOM --- */
         .grid { 
             display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
             gap: 25px; width: 100%; max-width: 1400px; padding: 30px;
         }
         .card { 
             background: var(--white); border-radius: 35px; overflow: hidden; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.03); 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.03); display: flex; flex-direction: column;
         }
         .img-container { width: 100%; height: 230px; overflow: hidden; cursor: zoom-in; }
-        .card img { 
-            width: 100%; height: 100%; object-fit: cover; 
-            transition: transform 0.5s ease;
-        }
-        .card img:hover { transform: scale(1.15); } /* Hover Zoom */
+        .card img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .card img:hover { transform: scale(1.1); }
 
-        .card-body { padding: 25px; }
-        .tag { font-size: 0.7rem; font-weight: 700; color: var(--ruan-emerald); }
+        .card-body { padding: 25px; flex-grow: 1; display: flex; flex-direction: column; }
+        .tag { font-size: 0.7rem; font-weight: 700; color: var(--ruan-emerald); margin-bottom: 5px; }
+        .date-text { font-size: 0.75rem; color: #999; margin-top: auto; padding-top: 15px; border-top: 1px dashed #eee; font-weight: 600; }
 
-        /* --- MODAL ZOOM (Full Screen Zoom) --- */
+        /* --- ZOOM MODAL --- */
         #zoom-modal {
             position: fixed; inset: 0; background: rgba(0,0,0,0.9);
-            z-index: 20000; display: none; justify-content: center; align-items: center;
-            cursor: zoom-out;
+            z-index: 20000; display: none; justify-content: center; align-items: center; cursor: zoom-out;
         }
-        #zoom-modal img { max-width: 90%; max-height: 90%; border-radius: 10px; box-shadow: 0 0 30px rgba(255,255,255,0.2); }
+        #zoom-modal img { max-width: 90%; max-height: 90%; border-radius: 15px; }
 
         #music-toggle {
             position: fixed; bottom: 25px; left: 25px; z-index: 100;
             background: var(--white); padding: 12px 20px; border-radius: 50px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1); cursor: pointer; font-weight: 700; font-size: 0.9rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); cursor: pointer; font-weight: 700;
         }
     </style>
 </head>
@@ -114,14 +110,15 @@
     <div id="music-toggle" onclick="toggleMusic()">🎵 Musik: Aktif</div>
 
     <div id="zoom-modal" onclick="this.style.display='none'">
-        <img id="modal-img" src="" alt="Zoomed">
+        <img id="modal-img" src="">
     </div>
 
     <div id="loader">
         <div class="spinner"></div>
-        <p style="margin-top: 15px; font-weight: 700; color: var(--ruan-deep);">Menghubungkan Neural Link...</p>
+        <p style="margin-top: 15px; font-weight: 700; color: var(--ruan-deep);">Synchronizing Lab Data...</p>
     </div>
 
+    <!-- SECTIONS -->
     <section id="step-1" class="page-section active">
         <h1>Arsip Penelitian</h1>
         <div class="quote-box">"It's a wonder how life, in all its forms, finds its way to survive. I simply wish to understand its essence." — Ruan Mei</div>
@@ -140,7 +137,7 @@
             <button class="nav-btn" onclick="goStep3('11')">Kelas 11</button>
             <button class="nav-btn" onclick="goStep3('12')">Kelas 12</button>
         </div>
-        <div class="back-link" onclick="showSection('step-1')">Ganti Mata Pelajaran</div>
+        <div class="back-link" onclick="showSection('step-1')">Kembali</div>
     </section>
 
     <section id="step-3" class="page-section">
@@ -156,11 +153,10 @@
     <section id="step-4" class="page-section" style="justify-content: flex-start;">
         <div class="marquee-wrap">
             <div class="marquee-content" id="marquee-text">
-                Memuat data eksperimen... Mohon perbarui file HTML untuk melihat entri penelitian terbaru.
+                Memuat data... Pastikan spreadsheet terisi dengan benar. Selamat meneliti!
             </div>
         </div>
         <h1 id="final-title" style="margin-top: 40px;">Hasil Analisis</h1>
-        <p style="font-size: 0.8rem; opacity: 0.6; margin-bottom: 20px;">*Klik gambar untuk memperbesar (Zoom)</p>
         <div class="back-link" onclick="showSection('step-3')">← Reset Filter</div>
         <div class="grid" id="display-grid"></div>
     </section>
@@ -171,6 +167,13 @@
         let state = { mapel: '', kelas: '', smt: '' };
         const audio = document.getElementById('bgm');
 
+        // Fungsi format tanggal otomatis jika kosong
+        function getToday() {
+            const date = new Date();
+            const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            return `${date.getDate().toString().padStart(2, '0')} ${months[date.getMonth()]} ${date.getFullYear()}`;
+        }
+
         async function init() {
             try {
                 const response = await fetch(csvUrl);
@@ -178,13 +181,20 @@
                 const lines = data.split('\n').slice(1);
                 rawData = lines.map(line => {
                     const c = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                    return { kelas: c[0]?.trim(), mapel: c[1]?.trim(), smt: c[2]?.trim(), judul: c[3]?.trim(), link: c[4]?.trim(), desc: c[5]?.trim() };
+                    return { 
+                        kelas: c[0]?.trim(), 
+                        mapel: c[1]?.trim(), 
+                        smt: c[2]?.trim(), 
+                        judul: c[3]?.trim(), 
+                        link: c[4]?.trim(), 
+                        desc: c[5]?.trim(),
+                        tgl: c[6]?.trim() // Kolom Tanggal (G)
+                    };
                 }).filter(x => x.judul);
                 
-                document.getElementById('marquee-text').innerText = `Status Lab: Aktif. Total ${rawData.length} subjek penelitian ditemukan. "Life is an endless experiment." — Update file HTML secara berkala!`;
-                
+                document.getElementById('marquee-text').innerText = `Status Lab: Aktif. Terdata ${rawData.length} tugas terkumpul. "The essence of life is research." — Update file HTML jika ada perubahan struktur.`;
                 setTimeout(() => document.getElementById('loader').style.display = 'none', 1500);
-            } catch (err) { console.log("Error loading data."); }
+            } catch (err) { console.log("Failed to load data"); }
         }
 
         function showSection(id) {
@@ -209,13 +219,14 @@
 
         function finish(s) {
             state.smt = s;
-            document.getElementById('final-title').innerText = `${state.mapel} - Kelas ${state.kelas}`;
+            document.getElementById('final-title').innerText = `${state.mapel} Kelas ${state.kelas}`;
             const filtered = rawData.filter(d => d.mapel === state.mapel && d.kelas === state.kelas && d.smt === s);
             
             const grid = document.getElementById('display-grid');
-            grid.innerHTML = filtered.length ? '' : '<p>Data tidak ditemukan.</p>';
+            grid.innerHTML = filtered.length ? '' : '<p>Belum ada spesimen data.</p>';
             
             filtered.forEach(item => {
+                const displayDate = item.tgl && item.tgl !== "" ? item.tgl : getToday();
                 grid.innerHTML += `
                     <div class="card">
                         <div class="img-container" onclick="openZoom('${item.link}')">
@@ -223,8 +234,9 @@
                         </div>
                         <div class="card-body">
                             <span class="tag">SEMESTER ${item.smt}</span>
-                            <div style="font-weight:700; font-size:1.4rem; margin:8px 0;">${item.judul}</div>
-                            <p style="font-size:0.85rem; opacity:0.7; line-height:1.5;">${item.desc}</p>
+                            <div style="font-weight:700; font-size:1.4rem; margin-bottom:8px;">${item.judul}</div>
+                            <p style="font-size:0.85rem; opacity:0.7; margin-bottom:15px;">${item.desc}</p>
+                            <div class="date-text">📅 Diarsipkan: ${displayDate}</div>
                         </div>
                     </div>`;
             });
