@@ -3,161 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portofolio IPA | GitHub Edition</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Caveat:wght@700&display=swap" rel="stylesheet">
+    <title>IPA Science Gallery | Pasilyo Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --ipa-green: #2d6a4f;
-            --ipa-light: #d8f3dc;
-            --ipa-accent: #52b788;
-            --white: #ffffff;
-        }
+        :root { --primary: #52b788; --secondary: #b7e4c7; --dark: #1b4332; --bg: #f7fff7; }
+        body { margin: 0; font-family: 'Quicksand', sans-serif; background-color: var(--bg); overflow-x: hidden; }
 
-        body { margin: 0; font-family: 'Poppins', sans-serif; background: #f0f4f2; color: #333; }
+        /* --- LOADING SCREEN --- */
+        #loader { position: fixed; inset: 0; background: white; z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .science-icon { width: 80px; height: 80px; border: 6px solid var(--secondary); border-top: 6px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* --- HEADER --- */
-        .header { 
-            background: linear-gradient(135deg, var(--ipa-green), var(--ipa-accent)); 
-            color: white; padding: 50px 20px; text-align: center;
-        }
-        .header h1 { font-family: 'Caveat', cursive; font-size: 3.5rem; margin: 0; }
-        
-        /* --- MULTI DROPDOWN BOX --- */
-        .filter-container {
-            max-width: 900px; margin: -30px auto 40px; background: white;
-            padding: 25px; border-radius: 20px; display: flex; flex-wrap: wrap;
-            gap: 15px; justify-content: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-        .filter-group { display: flex; flex-direction: column; gap: 5px; }
-        .filter-group label { font-size: 0.7rem; font-weight: bold; color: var(--ipa-green); margin-left: 5px; }
-        
-        select {
-            padding: 12px 20px; border-radius: 12px; border: 2px solid var(--ipa-light);
-            font-family: 'Poppins', sans-serif; font-weight: 600; color: var(--ipa-green);
-            outline: none; min-width: 180px; transition: 0.3s;
-        }
-        select:focus { border-color: var(--ipa-accent); }
+        /* --- LANDING PAGE --- */
+        #landing-page { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
+        .welcome-text { font-size: 2.5rem; font-weight: 700; color: var(--primary); margin-bottom: 10px; }
+        .btn-mapel { padding: 18px 35px; font-size: 1rem; font-weight: 700; border: none; border-radius: 20px; background: white; color: var(--primary); cursor: pointer; transition: 0.3s; box-shadow: 0 10px 20px rgba(82, 183, 136, 0.2); margin: 10px; }
+        .btn-mapel:hover { transform: translateY(-5px); background: var(--primary); color: white; }
 
-        /* --- CONTENT SECTION --- */
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px 50px; }
-        .section-title { 
-            font-family: 'Caveat', cursive; font-size: 2.5rem; 
-            color: var(--ipa-green); text-align: center; margin-bottom: 30px; 
-        }
+        /* --- MAIN APP --- */
+        #main-app { display: none; }
+        .running-text { background: var(--dark); color: white; padding: 10px 0; font-size: 0.85rem; font-weight: 600; }
+        header { text-align: center; padding: 40px 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; padding: 0 40px 60px; max-width: 1600px; margin: auto; }
+        .card { background: white; border-radius: 25px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.02); transition: 0.4s; }
+        .card:hover { transform: scale(1.02); }
+        .card img { width: 100%; height: 220px; object-fit: cover; }
+        .card-content { padding: 20px; }
 
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; }
-        .card { 
-            background: white; border-radius: 20px; overflow: hidden; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: 0.3s;
+        /* --- MUSIC CONTROLLER --- */
+        #music-control {
+            position: fixed; bottom: 25px; right: 25px; z-index: 9999;
+            background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(5px);
+            padding: 12px; border-radius: 50%; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: 0.3s; border: 2px solid var(--primary);
         }
-        .card:hover { transform: translateY(-10px); }
-        .card img { width: 100%; height: 200px; object-fit: cover; }
-        .card-body { padding: 20px; }
-        .card-title { font-family: 'Caveat', cursive; font-size: 1.8rem; color: var(--ipa-green); margin: 5px 0; }
-        .badge { background: var(--ipa-light); color: var(--ipa-green); padding: 4px 10px; border-radius: 8px; font-size: 0.7rem; font-weight: bold; }
-
-        #no-data { text-align: center; padding: 50px; display: none; color: #888; }
+        #music-control:hover { transform: scale(1.1); background: white; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>Sains & Eksplorasi</h1>
-        <p>Dokumentasi Tugas Mata Pelajaran IPA</p>
+    <audio id="bgm" loop>
+        <source src="pasilyo.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="music-control" onclick="toggleMusic()" style="display: none;">
+        <span id="music-icon" style="font-size: 1.5rem;">🔊</span>
     </div>
 
-    <div class="filter-container">
-        <div class="filter-group">
-            <label>MATA PELAJARAN</label>
-            <select id="fMapel" onchange="applyFilter()">
-                <option value="Biologi">Biologi</option>
-                <option value="Fisika">Fisika</option>
-                <option value="Kimia">Kimia</option>
-            </select>
-        </div>
-        <div class="filter-group">
-            <label>KELAS</label>
-            <select id="fKelas" onchange="applyFilter()">
-                <option value="10">Kelas 10</option>
-                <option value="11">Kelas 11</option>
-                <option value="12">Kelas 12</option>
-            </select>
-        </div>
-        <div class="filter-group">
-            <label>SEMESTER</label>
-            <select id="fSmt" onchange="applyFilter()">
-                <option value="1">Semester 1</option>
-                <option value="2">Semester 2</option>
-            </select>
+    <div id="loader">
+        <div class="science-icon"></div>
+        <p style="margin-top:15px; font-weight:700; color:var(--primary)">Preparing your journey...</p>
+    </div>
+
+    <div id="landing-page">
+        <div class="welcome-text">Science Gallery Explorer</div>
+        <p style="opacity: 0.7; margin-bottom: 30px;">"Panalangin ko sa habang buhay..."</p>
+        <div class="mapel-buttons">
+            <button class="btn-mapel" onclick="startApp('Biologi')">🌿 Biologi</button>
+            <button class="btn-mapel" onclick="startApp('Fisika')">⚡ Fisika</button>
+            <button class="btn-mapel" onclick="startApp('Kimia')">🧪 Kimia</button>
         </div>
     </div>
 
-    <div class="container">
-        <h2 id="display-title" class="section-title">Hasil Penelusuran</h2>
+    <div id="main-app">
+        <div class="running-text">
+            <marquee id="marquee-text">Loading statistics...</marquee>
+        </div>
+        <header>
+            <p onclick="goBack()" style="cursor:pointer; color:var(--primary); font-weight:700;">← Kembali</p>
+            <h1 id="title-mapel" style="font-size: 3rem; margin: 5px 0;">Biologi</h1>
+        </header>
         <div class="grid" id="gallery"></div>
-        <div id="no-data">Belum ada dokumentasi untuk kategori ini.</div>
     </div>
 
     <script>
         const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRyJ4VihwGxpbpxQfSDKMb5AiPVmY1-wFviOWyEjfsuljcLPXUypWMNVDakdmM-58m31gNBNydwGSEe/pub?output=csv";
-        let rawData = [];
+        let db = [];
+        let activeMapel = "";
+        const music = document.getElementById('bgm');
 
         async function init() {
             try {
                 const res = await fetch(csvUrl);
                 const text = await res.text();
                 const rows = text.split('\n').slice(1);
-                
-                rawData = rows.map(row => {
-                    const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                    return {
-                        kelas: cols[0]?.replace(/"/g, "").trim(),
-                        mapel: cols[1]?.replace(/"/g, "").trim(),
-                        smt: cols[2]?.replace(/"/g, "").trim(),
-                        judul: cols[3]?.replace(/"/g, "").trim(),
-                        link: cols[4]?.replace(/"/g, "").trim(),
-                        desc: cols[5]?.replace(/"/g, "").trim()
-                    };
-                }).filter(r => r.judul);
-                
-                applyFilter();
-            } catch (err) { console.error(err); }
+                db = rows.map(r => {
+                    const c = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                    return { kelas: c[0]?.trim(), mapel: c[1]?.trim(), smt: c[2]?.trim(), judul: c[3]?.trim(), link: c[4]?.trim(), desc: c[5]?.trim() };
+                }).filter(x => x.judul);
+
+                document.getElementById('marquee-text').innerText = `Total Karya Terdata: ${db.length} Project • Menjelajahi indahnya sains ditemani Pasilyo...`;
+                setTimeout(() => { document.getElementById('loader').style.opacity = '0'; setTimeout(()=> document.getElementById('loader').style.display='none', 800); }, 2000);
+            } catch (e) { console.error(e); }
         }
 
-        function applyFilter() {
-            const m = document.getElementById('fMapel').value;
-            const k = document.getElementById('fKelas').value;
-            const s = document.getElementById('fSmt').value;
+        function startApp(mapel) {
+            // PLAY MUSIC
+            music.volume = 0.4;
+            music.play().catch(e => console.log("Autoplay blocked, waiting for interaction"));
             
-            // Update Judul Halaman
-            document.getElementById('display-title').innerText = `${m} - Kelas ${k}`;
-
-            const filtered = rawData.filter(d => d.mapel === m && d.kelas === k && d.smt === s);
-            render(filtered);
+            document.getElementById('music-control').style.display = 'flex';
+            document.getElementById('title-mapel').innerText = mapel;
+            document.getElementById('landing-page').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+            activeMapel = mapel;
+            render();
         }
 
-        function render(items) {
-            const container = document.getElementById('gallery');
-            const empty = document.getElementById('no-data');
-            container.innerHTML = '';
-            
-            if(items.length === 0) {
-                empty.style.display = 'block';
-                return;
+        function toggleMusic() {
+            const icon = document.getElementById('music-icon');
+            if (music.muted) {
+                music.muted = false;
+                icon.innerText = "🔊";
+            } else {
+                music.muted = true;
+                icon.innerText = "🔇";
             }
-            
-            empty.style.display = 'none';
-            items.forEach(item => {
-                container.innerHTML += `
-                    <div class="card">
-                        <img src="${item.link}" onerror="this.src='https://via.placeholder.com/400x250?text=IPA+Project'">
-                        <div class="card-body">
-                            <span class="badge">Semester ${item.smt}</span>
-                            <div class="card-title">${item.judul}</div>
-                            <p style="font-size:0.85rem; color:#666;">${item.desc}</p>
-                        </div>
-                    </div>`;
-            });
+        }
+
+        function goBack() {
+            document.getElementById('landing-page').style.display = 'flex';
+            document.getElementById('main-app').style.display = 'none';
+            document.getElementById('music-control').style.display = 'none';
+            music.pause();
+            music.currentTime = 0;
+        }
+
+        function render() {
+            const cont = document.getElementById('gallery');
+            const filtered = db.filter(d => d.mapel === activeMapel);
+            cont.innerHTML = filtered.map(item => `
+                <div class="card">
+                    <img src="${item.link}" onerror="this.src='https://via.placeholder.com/400x250?text=IPA+Project'">
+                    <div class="card-content">
+                        <span style="font-size:0.7rem; font-weight:700; color:var(--primary)">KELAS ${item.kelas} • SMT ${item.smt}</span>
+                        <div style="font-size:1.3rem; font-weight:700; margin:10px 0;">${item.judul}</div>
+                        <p style="font-size:0.85rem; opacity:0.7;">${item.desc}</p>
+                    </div>
+                </div>
+            `).join('');
         }
 
         window.onload = init;
