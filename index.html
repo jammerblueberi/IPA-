@@ -1,203 +1,212 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Genius Society Research Log</title>
+    <title>Genius Society | Research Archive</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --herta-purple: #b39ddb;
-            --ruan-green: #4db6ac;
-            --dark-space: #1a1a2e;
-            --soft-bg: #f3e5f5;
+            --herta-lavender: #d1c4e9;
+            --herta-dark: #5e35b1;
+            --ruan-emerald: #4db6ac;
+            --ruan-deep: #00695c;
+            --bg-space: #f8f7fa;
             --white: #ffffff;
         }
 
-        * { box-sizing: border-box; transition: all 0.3s ease; }
+        * { box-sizing: border-box; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        
         body { 
             margin: 0; font-family: 'Quicksand', sans-serif; 
-            background: var(--soft-bg); color: var(--dark-space);
+            background: var(--bg-space); color: #333;
             overflow-x: hidden;
         }
 
-        /* --- BACKGROUND --- */
-        .bg-pattern {
-            position: fixed; inset: 0; z-index: -1; opacity: 0.2;
-            background-image: url('https://www.transparenttextures.com/patterns/mi-cha.png');
-        }
-
-        /* --- LOADING --- */
+        /* --- LOADING SCREEN --- */
         #loader {
             position: fixed; inset: 0; background: var(--white); z-index: 10000;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
-        .atom-spinner {
-            width: 60px; height: 60px; border: 5px solid var(--herta-purple);
-            border-top: 5px solid var(--ruan-green); border-radius: 50%;
+        .spinner {
+            width: 70px; height: 70px; border: 6px solid var(--herta-lavender);
+            border-top: 6px solid var(--ruan-emerald); border-radius: 50%;
             animation: spin 1s linear infinite;
         }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* --- NAVIGATION WRAPPER --- */
+        /* --- SECTIONS --- */
         .page-section { 
             min-height: 100vh; display: none; flex-direction: column; 
-            align-items: center; justify-content: center; padding: 40px 20px; 
+            align-items: center; justify-content: center; padding: 50px 20px; 
         }
-        .page-active { display: flex; animation: fadeIn 0.5s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .active { display: flex; animation: slideUp 0.6s ease forwards; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- TYPOGRAPHY --- */
-        h1 { font-weight: 700; font-size: 2.5rem; text-align: center; color: var(--ruan-green); margin-bottom: 10px; }
-        .quote { font-style: italic; opacity: 0.7; text-align: center; max-width: 600px; margin-bottom: 40px; line-height: 1.6; }
-
-        /* --- BUTTONS & INPUTS --- */
-        .btn-grid { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; }
-        .choice-btn {
-            padding: 15px 35px; border: none; border-radius: 30px; 
-            background: var(--white); color: var(--dark-space);
-            font-weight: 700; cursor: pointer; font-family: 'Quicksand';
-            box-shadow: 0 8px 15px rgba(0,0,0,0.05);
+        /* --- UI ELEMENTS --- */
+        h1 { font-weight: 700; font-size: 3rem; color: var(--ruan-deep); margin-bottom: 15px; text-align: center; }
+        .quote-box { 
+            max-width: 700px; text-align: center; font-style: italic; 
+            color: #666; margin-bottom: 40px; line-height: 1.6; font-size: 1.1rem;
         }
-        .choice-btn:hover { 
-            background: var(--ruan-green); color: white; transform: scale(1.05);
-            box-shadow: 0 12px 20px rgba(77, 182, 172, 0.3);
-        }
-        .back-link { margin-top: 30px; cursor: pointer; font-weight: 600; opacity: 0.6; text-decoration: underline; }
 
-        /* --- GALLERY --- */
-        .marquee-box { width: 100%; background: var(--dark-space); color: var(--herta-purple); padding: 10px 0; font-weight: 600; font-size: 0.8rem; }
+        .btn-container { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+        .nav-btn {
+            padding: 20px 45px; border: none; border-radius: 40px; 
+            background: var(--white); color: var(--ruan-deep);
+            font-size: 1.2rem; font-weight: 700; cursor: pointer;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border: 2px solid transparent;
+        }
+        .nav-btn:hover { 
+            border-color: var(--herta-lavender); 
+            transform: translateY(-8px);
+            background: var(--ruan-emerald); color: white;
+        }
+
+        .back-link { margin-top: 40px; cursor: pointer; font-weight: 700; color: var(--herta-dark); text-decoration: underline; }
+
+        /* --- GALLERY GRID --- */
+        .marquee-info { width: 100%; background: var(--herta-dark); color: white; padding: 12px 0; font-weight: 600; }
         .grid { 
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
-            gap: 25px; width: 100%; max-width: 1400px; margin-top: 30px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
+            gap: 30px; width: 100%; max-width: 1400px; padding: 40px;
         }
         .card { 
-            background: var(--white); border-radius: 35px; overflow: hidden; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.03); 
+            background: var(--white); border-radius: 40px; overflow: hidden; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.03); 
         }
-        .card img { width: 100%; height: 200px; object-fit: cover; }
-        .card-body { padding: 25px; }
-        .card-tag { font-size: 0.65rem; font-weight: 700; color: var(--herta-purple); text-transform: uppercase; }
+        .card img { width: 100%; height: 250px; object-fit: cover; }
+        .card-body { padding: 30px; }
+        .tag { font-size: 0.7rem; font-weight: 700; color: var(--ruan-emerald); letter-spacing: 1px; }
 
-        #music-control {
-            position: fixed; bottom: 20px; left: 20px; z-index: 9999;
-            background: var(--white); border-radius: 50px; padding: 10px 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1); cursor: pointer; font-weight: 700;
+        #music-toggle {
+            position: fixed; bottom: 30px; left: 30px; z-index: 100;
+            background: var(--white); padding: 15px 25px; border-radius: 50px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1); cursor: pointer; font-weight: 700;
         }
     </style>
 </head>
 <body>
 
-    <div class="bg-pattern"></div>
     <audio id="bgm" loop><source src="pasilyo.mp3" type="audio/mpeg"></audio>
+    <div id="music-toggle" onclick="toggleMusic()">🎵 Audio: Active</div>
 
     <div id="loader">
-        <div class="atom-spinner"></div>
-        <p style="margin-top: 15px; font-weight: 700; color: var(--ruan-green);">Synchronizing Neural Link...</p>
+        <div class="spinner"></div>
+        <p style="margin-top: 20px; font-weight: 700; color: var(--ruan-deep);">Synchronizing Lab Data...</p>
     </div>
 
-    <section id="step-mapel" class="page-section page-active">
-        <h1>Genius Society Log</h1>
-        <p class="quote">"It's a wonder how life, in all its forms, finds its way to survive. I simply wish to understand its essence." — Ruan Mei</p>
-        <div class="btn-grid">
-            <button class="choice-btn" onclick="setMapel('Biologi')">🌿 Biologi</button>
-            <button class="choice-btn" onclick="setMapel('Fisika')">⚡ Fisika</button>
-            <button class="choice-btn" onclick="setMapel('Kimia')">🧪 Kimia</button>
+    <section id="step-1" class="page-section active">
+        <h1>Research Archive</h1>
+        <div class="quote-box">
+            "It's a wonder how life, in all its forms, finds its way to survive. I simply wish to understand its essence." — Ruan Mei
+        </div>
+        <div class="btn-container">
+            <button class="nav-btn" onclick="goStep2('Biologi')">🌿 Biology</button>
+            <button class="nav-btn" onclick="goStep2('Fisika')">⚡ Physics</button>
+            <button class="nav-btn" onclick="goStep2('Kimia')">🧪 Chemistry</button>
         </div>
     </section>
 
-    <section id="step-kelas" class="page-section">
-        <h1 id="title-kelas">Select Grade</h1>
-        <p class="quote">"Research requires patience. Every stage of growth is a data point worth observing."</p>
-        <div class="btn-grid">
-            <button class="choice-btn" onclick="setKelas('10')">Grade 10</button>
-            <button class="choice-btn" onclick="setKelas('11')">Grade 11</button>
-            <button class="choice-btn" onclick="setKelas('12')">Grade 12</button>
+    <section id="step-2" class="page-section">
+        <h1 id="subject-name">Subject</h1>
+        <div class="quote-box">
+            "Research requires patience. Every stage of growth is a data point worth observing."
         </div>
-        <span class="back-link" onclick="navTo('step-mapel')">Change Subject</span>
-    </section>
-
-    <section id="step-smt" class="page-section">
-        <h1 id="title-smt">Select Period</h1>
-        <div class="btn-grid">
-            <button class="choice-btn" onclick="renderFinal('1')">Semester 1</button>
-            <button class="choice-btn" onclick="renderFinal('2')">Semester 2</button>
+        <div class="btn-container">
+            <button class="nav-btn" onclick="goStep3('10')">Grade 10</button>
+            <button class="nav-btn" onclick="goStep3('11')">Grade 11</button>
+            <button class="nav-btn" onclick="goStep3('12')">Grade 12</button>
         </div>
-        <span class="back-link" onclick="navTo('step-kelas')">Change Grade</span>
+        <div class="back-link" onclick="showSection('step-1')">Change Subject</div>
     </section>
 
-    <section id="step-gallery" class="page-section" style="justify-content: flex-start;">
-        <div class="marquee-box"><marquee id="marquee-text"></marquee></div>
-        <h1 id="title-final" style="margin-top: 40px;">Research Results</h1>
-        <span class="back-link" onclick="navTo('step-smt')">← Back to Filter</span>
-        <div class="grid" id="gallery-grid"></div>
+    <section id="step-3" class="page-section">
+        <h1>Period Selection</h1>
+        <div class="quote-box">
+            "Time is but a dimension in the grand experiment of life."
+        </div>
+        <div class="btn-container">
+            <button class="nav-btn" onclick="finish('1')">Semester 1</button>
+            <button class="nav-btn" onclick="finish('2')">Semester 2</button>
+        </div>
+        <div class="back-link" onclick="showSection('step-2')">Go Back</div>
     </section>
 
-    <div id="music-control" onclick="toggleMusic()">🎵 Background: On</div>
+    <section id="step-4" class="page-section" style="justify-content: flex-start;">
+        <div class="marquee-info">
+            <marquee id="marquee-text">Syncing data with Google Sheets... Please update your HTML file to reflect the latest research entries.</marquee>
+        </div>
+        <h1 id="final-title" style="margin-top: 50px;">Specimens</h1>
+        <div class="back-link" onclick="showSection('step-3')">← Adjust Filters</div>
+        <div class="grid" id="display-grid"></div>
+    </section>
 
     <script>
         const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRyJ4VihwGxpbpxQfSDKMb5AiPVmY1-wFviOWyEjfsuljcLPXUypWMNVDakdmM-58m31gNBNydwGSEe/pub?output=csv";
-        let db = [];
-        let selection = { mapel: '', kelas: '', smt: '' };
-        const music = document.getElementById('bgm');
+        let rawData = [];
+        let state = { mapel: '', kelas: '', smt: '' };
+        const audio = document.getElementById('bgm');
 
         async function init() {
             try {
-                const res = await fetch(csvUrl);
-                const text = await res.text();
-                const rows = text.split('\n').slice(1);
-                db = rows.map(r => {
-                    const c = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                const response = await fetch(csvUrl);
+                const data = await response.text();
+                const lines = data.split('\n').slice(1);
+                rawData = lines.map(line => {
+                    const c = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
                     return { kelas: c[0]?.trim(), mapel: c[1]?.trim(), smt: c[2]?.trim(), judul: c[3]?.trim(), link: c[4]?.trim(), desc: c[5]?.trim() };
                 }).filter(x => x.judul);
-                document.getElementById('marquee-text').innerText = `Data detected: ${db.length} Subjects analyzed. Laboratory status: Operational. Background melody active.`;
-                setTimeout(() => document.getElementById('loader').style.display='none', 1500);
-            } catch (e) { alert("Neural link failed."); }
+                
+                document.getElementById('marquee-text').innerText = `Status: Operational. Total ${rawData.length} specimens analyzed. Remember to update your HTML file if you change the Spreadsheet structure!`;
+                setTimeout(() => document.getElementById('loader').style.display = 'none', 1500);
+            } catch (err) { console.error("Neural link failed."); }
         }
 
-        function navTo(id) {
-            document.querySelectorAll('.page-section').forEach(s => s.classList.remove('page-active'));
-            document.getElementById(id).classList.add('page-active');
+        function showSection(id) {
+            document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            window.scrollTo(0,0);
         }
 
-        function setMapel(m) {
-            selection.mapel = m;
-            document.getElementById('title-kelas').innerText = m + " Research";
-            if(music.paused) { music.volume = 0.3; music.play(); }
-            navTo('step-kelas');
+        function goStep2(m) {
+            state.mapel = m;
+            document.getElementById('subject-name').innerText = m + " Analysis";
+            if(audio.paused) { audio.volume = 0.3; audio.play(); }
+            showSection('step-2');
         }
 
-        function setKelas(k) {
-            selection.kelas = k;
-            document.getElementById('title-smt').innerText = `${selection.mapel} - Grade ${k}`;
-            navTo('step-smt');
+        function goStep3(k) {
+            state.kelas = k;
+            showSection('step-3');
         }
 
-        function renderFinal(s) {
-            selection.smt = s;
-            document.getElementById('title-final').innerText = `${selection.mapel} Grade ${selection.kelas}`;
-            const filtered = db.filter(d => d.mapel === selection.mapel && d.kelas === selection.kelas && d.smt === s);
+        function finish(s) {
+            state.smt = s;
+            document.getElementById('final-title').innerText = `${state.mapel} - Grade ${state.kelas}`;
+            const filtered = rawData.filter(d => d.mapel === state.mapel && d.kelas === state.kelas && d.smt === s);
             
-            const grid = document.getElementById('gallery-grid');
-            grid.innerHTML = filtered.length ? '' : '<p>No specimen found in this sector.</p>';
+            const grid = document.getElementById('display-grid');
+            grid.innerHTML = filtered.length ? '' : '<p style="text-align:center; width:100%;">No data recorded for this sector.</p>';
             
             filtered.forEach(item => {
                 grid.innerHTML += `
                     <div class="card">
-                        <img src="${item.link}" onerror="this.src='https://via.placeholder.com/400x250?text=No+Data'">
+                        <img src="${item.link}" onerror="this.src='https://via.placeholder.com/400x250?text=No+Specimen'">
                         <div class="card-body">
-                            <span class="card-tag">Period ${item.smt}</span>
-                            <div style="font-weight:700; font-size:1.4rem; margin:10px 0;">${item.judul}</div>
-                            <p style="font-size:0.85rem; opacity:0.7;">${item.desc}</p>
+                            <span class="tag">SEMESTER ${item.smt}</span>
+                            <div style="font-weight:700; font-size:1.5rem; margin:10px 0;">${item.judul}</div>
+                            <p style="font-size:0.9rem; opacity:0.7;">${item.desc}</p>
                         </div>
                     </div>`;
             });
-            navTo('step-gallery');
+            showSection('step-4');
         }
 
         function toggleMusic() {
-            music.muted = !music.muted;
-            document.getElementById('music-control').innerText = music.muted ? "🎵 Background: Off" : "🎵 Background: On";
+            audio.muted = !audio.muted;
+            document.getElementById('music-toggle').innerText = audio.muted ? "🎵 Audio: Muted" : "🎵 Audio: Active";
         }
 
         window.onload = init;
