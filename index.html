@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,282 +8,256 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --herta-dark: #12121e;
+            --herta-dark: #0d0d15;
             --herta-purple: #9d72d2;
             --ruan-teal: #64c4bc;
-            --glass: rgba(255, 255, 255, 0.07);
-            --glass-border: rgba(255, 255, 255, 0.12);
-            --text-main: #eef2f3;
+            --glass: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         
         body { 
-            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-            color: var(--text-main);
-            min-height: 100vh;
-            overflow-x: hidden;
+            background: radial-gradient(circle at top, #1a1a3a 0%, #0d0d15 100%);
+            color: #eef2f3; min-height: 100vh; overflow-x: hidden;
         }
 
-        /* Running Text */
-        .marquee-container {
-            background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(8px);
-            border-bottom: 1px solid var(--glass-border); padding: 12px 0; overflow: hidden;
+        /* Marquee */
+        .marquee-box {
+            background: rgba(0, 0, 0, 0.5); border-bottom: 1px solid var(--glass-border); padding: 10px 0;
         }
         .marquee-inner {
-            display: inline-block; animation: scroll 30s linear infinite;
-            font-weight: 700; color: var(--ruan-teal); letter-spacing: 2px; font-size: 0.8rem;
+            display: inline-block; animation: scroll 25s linear infinite;
+            font-weight: 700; color: var(--ruan-teal); font-size: 0.75rem; letter-spacing: 2px;
         }
 
         .container { max-width: 1000px; margin: auto; padding: 20px; text-align: center; }
-        header h1 { font-size: 2.5rem; margin-top: 20px; font-weight: 800; color: white; }
+        header h1 { font-size: 2.5rem; font-weight: 800; margin-top: 20px; text-transform: uppercase; letter-spacing: -1px; }
         header span { color: var(--ruan-teal); }
+        .quote { margin: 15px auto 40px; font-size: 0.85rem; color: #888; font-style: italic; }
 
-        /* Menu Grid */
-        .btn-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 30px; }
-        .menu-card {
-            background: var(--glass); border: 1px solid var(--glass-border); padding: 40px 20px;
+        /* Menu System */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
+        .card-btn {
+            background: var(--glass); border: 1px solid var(--glass-border); padding: 45px 20px;
             border-radius: 20px; cursor: pointer; transition: 0.3s; font-weight: 800; backdrop-filter: blur(10px);
         }
-        .menu-card:hover { border-color: var(--herta-purple); background: rgba(157, 114, 210, 0.15); transform: translateY(-5px); }
+        .card-btn:hover { border-color: var(--herta-purple); background: rgba(157, 114, 210, 0.1); transform: translateY(-3px); }
 
-        /* Task Cards */
-        .card-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; margin-top: 40px; }
-        .card {
-            background: var(--glass); border-radius: 22px; overflow: hidden; border: 1px solid var(--glass-border);
-            text-align: left; transition: 0.3s;
-        }
-        .card:hover { transform: scale(1.02); border-color: var(--ruan-teal); }
-
-        .img-box { position: relative; height: 220px; background: #000; }
-        .img-box img { width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
-        .nav-btn {
-            position: absolute; top: 50%; transform: translateY(-50%);
-            background: rgba(0,0,0,0.4); border: none; width: 35px; height: 35px;
-            border-radius: 50%; color: white; cursor: pointer;
+        /* Archive Grid */
+        .task-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 40px; }
+        .item { background: var(--glass); border-radius: 24px; border: 1px solid var(--glass-border); overflow: hidden; text-align: left; }
+        .img-h { position: relative; height: 220px; background: #000; }
+        .img-h img { width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
+        .info { padding: 20px; }
+        .pdf-link {
+            display: block; margin-top: 15px; background: var(--herta-purple); color: #fff;
+            text-align: center; padding: 10px; border-radius: 12px; text-decoration: none; font-weight: 800; font-size: 0.8rem;
         }
 
-        .card-body { padding: 20px; }
-        .tag { font-size: 0.7rem; font-weight: 800; color: var(--ruan-teal); display: block; margin-bottom: 10px; }
-        .pdf-btn {
-            display: block; margin-top: 15px; padding: 10px; text-align: center;
-            background: var(--herta-purple); color: white; text-decoration: none; border-radius: 10px;
-            font-size: 0.8rem; font-weight: 800;
+        /* OVERLAY COMMENT (The Fix) */
+        #comment-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
+            display: none; justify-content: center; align-items: center; z-index: 10000;
+        }
+        .overlay-content {
+            background: #1a1a2e; width: 90%; max-width: 450px; padding: 30px; 
+            border-radius: 25px; border: 1px solid var(--herta-purple); position: relative;
+        }
+        .close-btn { position: absolute; top: 15px; right: 20px; cursor: pointer; font-size: 1.5rem; }
+        input, textarea {
+            width: 100%; padding: 12px; margin: 10px 0; background: rgba(255,255,255,0.05);
+            border: 1px solid var(--glass-border); color: #fff; border-radius: 10px;
+        }
+        .send-btn {
+            width: 100%; padding: 12px; background: var(--ruan-teal); border: none;
+            border-radius: 10px; font-weight: 800; cursor: pointer; margin-top: 10px;
         }
 
-        /* Modal / Fullscreen Foto */
-        #lightbox {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000;
-            display: none; justify-content: center; align-items: center; cursor: pointer;
-        }
-        #lightbox img { max-width: 90%; max-height: 90%; border-radius: 10px; }
-
-        /* Comment Internal Box */
-        .comment-box {
-            background: var(--glass); border: 1px solid var(--glass-border);
-            padding: 25px; border-radius: 25px; margin-top: 50px; text-align: left;
-        }
-        .comment-box input, .comment-box textarea {
-            width: 100%; padding: 12px; margin-top: 10px; border-radius: 10px;
-            border: 1px solid var(--glass-border); background: rgba(255,255,255,0.05); color: white;
-        }
-        .submit-btn {
-            background: var(--ruan-teal); border: none; padding: 12px 25px; 
-            border-radius: 10px; margin-top: 15px; font-weight: 800; cursor: pointer;
-        }
+        /* Lightbox Foto */
+        #lbox { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; z-index: 10001; cursor: pointer; align-items: center; justify-content: center; }
+        #lbox img { max-width: 90%; max-height: 90%; border-radius: 10px; }
 
         /* Floating UI */
-        .floating { position: fixed; bottom: 25px; right: 25px; display: flex; flex-direction: column; gap: 15px; }
-        .f-btn {
-            width: 55px; height: 55px; border-radius: 50%; border: none; 
-            cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
-        }
-        .music-btn { background: var(--herta-purple); color: white; }
-        .comment-btn { background: var(--ruan-teal); color: white; animation: blink 2s infinite; }
+        .f-box { position: fixed; bottom: 25px; right: 25px; display: flex; flex-direction: column; gap: 15px; }
+        .circle { width: 55px; height: 55px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
+        .m-btn { background: var(--herta-purple); color: #fff; }
+        .c-btn { background: var(--ruan-teal); color: #fff; animation: pulse 2s infinite; }
 
         @keyframes scroll { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
-        @keyframes blink { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.1); } }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(100, 196, 188, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(100, 196, 188, 0); } 100% { box-shadow: 0 0 0 0 rgba(100, 196, 188, 0); } }
         .hidden { display: none; }
+        .nav-link { color: var(--ruan-teal); cursor: pointer; font-weight: 700; margin-bottom: 20px; display: inline-block; }
     </style>
 </head>
 <body>
 
-<div class="marquee-container">
-    <div class="marquee-inner" id="marqueeText">MENGUMPULKAN DATA IPA... SILAKAN PILIH KELAS...</div>
+<div class="marquee-box">
+    <div class="marquee-inner">BIOLOGICAL ARCHIVE SYSTEM • DATA COLLECTION IN PROGRESS • GENIUS SOCIETY #81 • HERTA SPACE STATION</div>
 </div>
 
 <div class="container">
-    <header><h1>IPA<span>ARCHIVE</span></h1></header>
+    <header><h1>IPA<span>COLLECTIVE</span></h1></header>
+    <div class="quote" id="enQuote">"Everything has a price, but the joy of discovery is worth more than any currency."</div>
 
-    <!-- Menu 1 -->
-    <div id="v-kelas">
-        <h3 style="margin:20px 0">Pilih Kelas</h3>
-        <div class="btn-grid">
-            <div class="menu-card" onclick="setKelas('10')">KELAS 10</div>
-            <div class="menu-card" onclick="setKelas('11')">KELAS 11</div>
-            <div class="menu-card" onclick="setKelas('12')">KELAS 12</div>
+    <!-- View Kelas -->
+    <div id="v-k">
+        <h3 style="margin-bottom:20px">Select Grade</h3>
+        <div class="grid">
+            <div class="card-btn" onclick="goK('10')">GRADE 10</div>
+            <div class="card-btn" onclick="goK('11')">GRADE 11</div>
+            <div class="card-btn" onclick="goK('12')">GRADE 12</div>
         </div>
     </div>
 
-    <!-- Menu 2 -->
-    <div id="v-mapel" class="hidden">
-        <p onclick="showV('v-kelas')" style="cursor:pointer; color:var(--ruan-teal)">← Kembali</p>
-        <h3 style="margin:20px 0">Pilih Mapel</h3>
-        <div class="btn-grid">
-            <div class="menu-card" onclick="setMapel('Biologi')">BIOLOGI</div>
-            <div class="menu-card" onclick="setMapel('Kimia')">KIMIA</div>
-            <div class="menu-card" onclick="setMapel('Fisika')">FISIKA</div>
+    <!-- View Mapel -->
+    <div id="v-m" class="hidden">
+        <span class="nav-link" onclick="backTo('v-k')">← CHANGE GRADE</span>
+        <div class="grid">
+            <div class="card-btn" onclick="goM('Biologi')">BIOLOGY</div>
+            <div class="card-btn" onclick="goM('Kimia')">CHEMISTRY</div>
+            <div class="card-btn" onclick="goM('Fisika')">PHYSICS</div>
         </div>
     </div>
 
-    <!-- Menu 3 -->
-    <div id="v-semester" class="hidden">
-        <p onclick="showV('v-mapel')" style="cursor:pointer; color:var(--ruan-teal)">← Kembali</p>
-        <h3 style="margin:20px 0">Pilih Semester</h3>
-        <div class="btn-grid">
-            <div class="menu-card" onclick="loadTasks('1')">SEMESTER 1</div>
-            <div class="menu-card" onclick="loadTasks('2')">SEMESTER 2</div>
+    <!-- View Semester -->
+    <div id="v-s" class="hidden">
+        <span class="nav-link" onclick="backTo('v-m')">← CHANGE SUBJECT</span>
+        <div class="grid">
+            <div class="card-btn" onclick="showTasks('1')">SEMESTER 1</div>
+            <div class="card-btn" onclick="showTasks('2')">SEMESTER 2</div>
         </div>
     </div>
 
-    <!-- Data View -->
-    <div id="v-data" class="hidden">
-        <p onclick="showV('v-semester')" style="cursor:pointer; color:var(--ruan-teal)">← Kembali</p>
-        <div class="card-container" id="grid"></div>
-
-        <!-- Custom Comment Form -->
-        <div class="comment-box" id="komen-area">
-            <h4>Berikan Masukan</h4>
-            <input type="text" id="nama" placeholder="Nama Kamu">
-            <textarea id="pesan" rows="4" placeholder="Masukan atau saran..."></textarea>
-            <button class="submit-btn" onclick="sendKomen()">KIRIM MASUKAN</button>
-            <p id="msg" style="margin-top:10px; font-size:0.8rem;"></p>
-        </div>
+    <!-- View Data -->
+    <div id="v-d" class="hidden">
+        <span class="nav-link" onclick="backTo('v-s')">← BACK TO MENU</span>
+        <div class="task-grid" id="mainGrid"></div>
     </div>
 </div>
 
-<!-- Fullscreen Foto (Modal) -->
-<div id="lightbox" onclick="this.style.display='none'"><img id="lbox-img"></div>
-
-<div class="floating">
-    <button class="f-btn music-btn" onclick="playM()" id="mIcon">🎵</button>
-    <button class="f-btn comment-btn" onclick="document.getElementById('komen-area').scrollIntoView()">💬</button>
+<!-- OVERLAY KOMEN (Tampil di tengah) -->
+<div id="comment-overlay">
+    <div class="overlay-content">
+        <span class="close-btn" onclick="toggleC(false)">×</span>
+        <h3 style="margin-bottom: 15px">Archive Feedback</h3>
+        <p style="font-size: 0.75rem; color: #888; margin-bottom: 10px;">Your feedback helps the Research Society.</p>
+        <input type="text" id="inp-nama" placeholder="Researcher Name (Your Name)">
+        <textarea id="inp-pesan" rows="4" placeholder="Observation or feedback..."></textarea>
+        <button class="send-btn" onclick="pushData()">SEND TO STATION</button>
+        <p id="stts" style="margin-top:10px; font-size:0.8rem;"></p>
+    </div>
 </div>
 
-<audio id="bgm" loop src="pasilyo.mp3"></audio>
+<div id="lbox" onclick="this.style.display='none'"><img id="limg"></div>
+
+<div class="f-box">
+    <button class="circle m-btn" onclick="pM()" id="mic">🎵</button>
+    <button class="circle c-btn" onclick="toggleC(true)">💬</button>
+</div>
+
+<audio id="player" loop src="pasilyo.mp3"></audio>
 
 <script>
     let cur = { k: '', m: '', s: '' };
     const csv = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRyJ4VihwGxpbpxQfSDKMb5AiPVmY1-wFviOWyEjfsuljcLPXUypWMNVDakdmM-58m31gNBNydwGSEe/pub?output=csv';
 
-    function showV(id) {
-        document.querySelectorAll('.container > div:not(header)').forEach(d => d.classList.add('hidden'));
+    // Quotes logic
+    const quotes = [
+        '"Everything has a price, but the joy of discovery is worth more than any currency."',
+        '"Life is but an experiment in progress."',
+        '"Creation is a beautiful, yet fragile process."',
+        '"Knowledge is the only thing that grows when shared."'
+    ];
+    document.getElementById('enQuote').innerText = quotes[Math.floor(Math.random()*quotes.length)];
+
+    function backTo(id) {
+        document.querySelectorAll('.container > div:not(header):not(.quote)').forEach(v => v.classList.add('hidden'));
         document.getElementById(id).classList.remove('hidden');
     }
 
-    function setKelas(k) { cur.k = k; showV('v-mapel'); document.getElementById('bgm').play().catch(()=>{}); }
-    function setMapel(m) { cur.m = m; showV('v-semester'); document.getElementById('marqueeText').innerText = `SUBJECT: ${m} | KELAS: ${cur.k}`; }
+    function goK(k) { cur.k = k; backTo('v-m'); document.getElementById('player').play().catch(()=>{}); }
+    function goM(m) { cur.m = m; backTo('v-s'); }
 
-    function loadTasks(s) {
-        cur.s = s;
-        showV('v-data');
-        const grid = document.getElementById('grid');
-        grid.innerHTML = 'Memuat memori...';
+    function showTasks(s) {
+        cur.s = s; backTo('v-d');
+        const g = document.getElementById('mainGrid');
+        g.innerHTML = 'Analyzing database...';
 
         Papa.parse(csv, {
             download: true, header: true,
-            complete: function(res) {
-                const data = res.data.filter(r => r.Kelas == cur.k && r.Mapel.trim() == cur.m && r.Semester == cur.s);
-                grid.innerHTML = '';
-                if(data.length === 0) { grid.innerHTML = 'Data tidak ditemukan.'; return; }
+            complete: (r) => {
+                const filtered = r.data.filter(row => row.Kelas == cur.k && row.Mapel.trim() == cur.m && row.Semester == cur.s);
+                g.innerHTML = '';
+                if(filtered.length === 0) { g.innerHTML = 'No data records found in this sector.'; return; }
 
-                data.forEach((item, i) => {
-                    const imgs = item['URL Foto'].split(',');
-                    const tgl = item.Tanggal || 'N/A';
-                    let desc = item.Deskripsi || '';
+                filtered.forEach((row, i) => {
+                    const photos = row['URL Foto'].split(',');
+                    let d = row.Deskripsi || '';
                     let pdf = '';
-
-                    if(desc.toLowerCase().includes('.pdf')) {
-                        const link = desc.match(/https?:\/\/[^\s]+/);
-                        if(link) { pdf = `<a href="${link[0]}" target="_blank" class="pdf-btn">BUKA PDF</a>`; desc = desc.replace(link[0], ''); }
+                    if(d.includes('http')) {
+                        const link = d.match(/https?:\/\/[^\s]+/);
+                        if(link) { pdf = `<a href="${link[0]}" target="_blank" class="pdf-link">ACCESS DATA FILE (PDF)</a>`; d = d.replace(link[0], ''); }
                     }
 
-                    const card = document.createElement('div');
-                    card.className = 'card';
-                    card.innerHTML = `
-                        <div class="img-box" id="img-${i}">
-                            <img src="${imgs[0]}" onclick="openFull('${imgs[0]}')">
-                            ${imgs.length > 1 ? `
-                                <button class="nav-btn" style="left:5px" onclick="slide('${i}', '${item['URL Foto']}', -1)">❮</button>
-                                <button class="nav-btn" style="right:5px" onclick="slide('${i}', '${item['URL Foto']}', 1)">❯</button>
-                            ` : ''}
+                    const div = document.createElement('div');
+                    div.className = 'item';
+                    div.innerHTML = `
+                        <div class="img-h" id="cont-${i}">
+                            <img src="${photos[0]}" onclick="zoom('${photos[0]}')">
                         </div>
-                        <div class="card-body">
-                            <span class="tag">${tgl}</span>
-                            <strong style="display:block;margin-bottom:5px">${item['Nama Tugas']}</strong>
-                            <p style="font-size:0.8rem; color:#bbb">${desc}</p>
+                        <div class="info">
+                            <small style="color:var(--ruan-teal);font-weight:800">${row.Tanggal || 'DATA_RECORD'}</small>
+                            <h4 style="margin:5px 0">${row['Nama Tugas']}</h4>
+                            <p style="font-size:0.75rem; color:#aaa; line-height:1.4">${d}</p>
                             ${pdf}
                         </div>
                     `;
-                    grid.appendChild(card);
+                    g.appendChild(div);
                 });
             }
         });
     }
 
-    function slide(id, str, dir) {
-        const img = document.querySelector(`#img-${id} img`);
-        const arr = str.split(',');
-        let idx = arr.indexOf(img.getAttribute('src'));
-        let n = (idx + dir + arr.length) % arr.length;
-        img.src = arr[n];
-    }
+    function zoom(s) { document.getElementById('limg').src = s; document.getElementById('lbox').style.display = 'flex'; }
+    function toggleC(show) { document.getElementById('comment-overlay').style.display = show ? 'flex' : 'none'; }
 
-    function openFull(src) {
-        document.getElementById('lbox-img').src = src;
-        document.getElementById('lightbox').style.display = 'flex';
-    }
+    function pushData() {
+        const n = document.getElementById('inp-nama').value;
+        const p = document.getElementById('inp-pesan').value;
+        const s = document.getElementById('stts');
 
-    // FITUR KOMEN INVISIBLE (Lewat Google Form belakang layar)
-    function sendKomen() {
-        const nama = document.getElementById('nama').value;
-        const pesan = document.getElementById('pesan').value;
-        const msg = document.getElementById('msg');
+        if(!n || !p) return alert('Input researcher name and observation.');
+        s.innerText = 'Transmitting data...';
 
-        if(!nama || !pesan) { alert('Isi nama dan pesan ya!'); return; }
-
-        msg.innerText = 'Mengirim masukan...';
-
-        // Ganti ID Entry sesuai dengan Google Form kamu (sudah disesuaikan dengan prefilled mu)
-        const formID = "1FAIpQLSc3EBonvoYp1r3EWmLQaghElqYEtamv4xAmghbGJN3bC-eLrQ";
-        const url = `https://docs.google.com/forms/d/e/${formID}/formResponse`;
+        const id = "1FAIpQLSc3EBonvoYp1r3EWmLQaghElqYEtamv4xAmghbGJN3bC-eLrQ";
+        const url = `https://docs.google.com/forms/d/e/${id}/formResponse`;
         
-        const formData = new FormData();
-        formData.append('entry.1078328655', cur.k); // Kelas
-        formData.append('entry.1470795916', cur.m); // Mapel
-        formData.append('entry.1054739972', `Semester ${cur.s}`); // Semester
-        formData.append('entry.1470795916', nama); // Bisa kamu ganti entry ID untuk Nama jika ada
-        formData.append('entry.1054739972', pesan); // Bisa kamu ganti entry ID untuk Pesan
+        const fd = new FormData();
+        // SESUAIKAN DENGAN SCREENSHOT: Urutan harus Kelas, Mapel+Pesan, Semester+Nama? 
+        // Sebaiknya kita petakan ulang sesuai screenshot kamu:
+        // entry.1078328655 -> Nama
+        // entry.1470795916 -> Masukan
+        // entry.1054739972 -> ID_Tugas (Kelas+Mapel+Semester)
 
-        // Mengirim data menggunakan No-Cors mode (karena Google Form membatasi cors)
-        fetch(url, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: formData
-        }).then(() => {
-            msg.style.color = 'var(--ruan-teal)';
-            msg.innerText = 'Masukan berhasil dikirim! (Cek Google Sheets kamu)';
-            document.getElementById('nama').value = '';
-            document.getElementById('pesan').value = '';
-        }).catch(() => {
-            msg.innerText = 'Gagal mengirim. Tapi coba cek Sheets kamu.';
+        fd.append('entry.1078328655', n); // Nama
+        fd.append('entry.1470795916', p); // Masukan
+        fd.append('entry.1054739972', `Grade ${cur.k} - ${cur.m} - Sem ${cur.s}`); // ID_Tugas
+
+        fetch(url, { method: 'POST', mode: 'no-cors', body: fd })
+        .then(() => {
+            s.style.color = 'var(--ruan-teal)';
+            s.innerText = 'Data successfully transmitted to Sheets!';
+            setTimeout(() => { toggleC(false); s.innerText = ''; }, 2000);
+            document.getElementById('inp-nama').value = '';
+            document.getElementById('inp-pesan').value = '';
         });
     }
 
-    function playM() {
-        const b = document.getElementById('bgm');
-        if(b.paused) { b.play(); document.getElementById('mIcon').innerText = '⏸'; }
-        else { b.pause(); document.getElementById('mIcon').innerText = '🎵'; }
+    function pM() {
+        const a = document.getElementById('player');
+        if(a.paused) { a.play(); document.getElementById('mic').innerText = '⏸'; }
+        else { a.pause(); document.getElementById('mic').innerText = '🎵'; }
     }
 </script>
 
