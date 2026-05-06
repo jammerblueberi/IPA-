@@ -3,242 +3,306 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IPA | Archive System</title>
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>IPA Archive - Herta & Ruan Mei</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --primary: #7e57c2; 
-            --accent: #26a69a; 
-            --bg: #fdfbff; 
-            --text: #2c3e50; 
+        :root {
+            --herta-purple: #7d5ba6;
+            --ruan-mei-teal: #a8dadc;
+            --space-dark: #0f0f1a;
+            --glass: rgba(255, 255, 255, 0.08);
+            --accent: #ff79c6;
         }
 
-        * { box-sizing: border-box; transition: all 0.3s ease; }
-        body { 
-            margin: 0; 
-            font-family: 'Quicksand', sans-serif; 
-            background: linear-gradient(135deg, #f3e5f5 0%, #e0f2f1 100%); 
-            color: var(--text); 
-            min-height: 100vh;
-        }
-
-        /* --- MARQUEE --- */
-        .marquee-wrapper {
-            width: 100%; background: rgba(126, 87, 194, 0.85); color: white; padding: 10px 0; overflow: hidden;
-        }
-        .marquee-text { display: inline-block; white-space: nowrap; animation: scroll-text 25s linear infinite; font-weight: 600; }
-        @keyframes scroll-text { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }
-
-        /* --- LAYOUT --- */
-        .section { min-height: 100vh; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
-        .active { display: flex; animation: fadeIn 0.6s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .btn-grid { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; }
-        .nav-btn { 
-            padding: 16px 32px; border: 2px solid var(--accent); border-radius: 16px; 
-            background: white; color: var(--text); font-weight: 700; cursor: pointer;
-        }
-        .nav-btn:hover { background: var(--accent); color: white; transform: translateY(-3px); }
-
-        /* --- CAROUSEL --- */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; width: 100%; max-width: 1100px; padding: 20px; }
-        .card { 
-            background: rgba(255, 255, 255, 0.8); border-radius: 24px; overflow: hidden; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.06); backdrop-filter: blur(12px);
-        }
-        .slider-container { position: relative; width: 100%; height: 230px; overflow: hidden; }
-        .slider-wrapper { display: flex; transition: transform 0.5s ease; height: 100%; }
-        .slider-wrapper img { width: 100%; height: 100%; object-fit: cover; flex-shrink: 0; cursor: pointer; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         
-        .slider-btn { 
-            position: absolute; top: 50%; transform: translateY(-50%); 
-            background: rgba(255,255,255,0.8); border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; z-index: 5;
-        }
-        .img-counter { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.5); color: white; padding: 3px 10px; border-radius: 12px; font-size: 0.7rem; }
-
-        /* --- FULLSCREEN ZOOM --- */
-        #zoom-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none;
-            justify-content: center; align-items: center; z-index: 9999; cursor: zoom-out;
-        }
-        #zoom-img { max-width: 95%; max-height: 95%; border-radius: 10px; transform: scale(1); transition: 0.3s; }
-
-        /* --- FAB AURA --- */
-        .fab { 
-            position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; 
-            background: var(--primary); color: white; border-radius: 50%; display: flex; 
-            align-items: center; justify-content: center; cursor: pointer; z-index: 1000; border: none;
-            animation: blinking-aura 2s infinite; font-size: 24px;
-        }
-        @keyframes blinking-aura {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(126, 87, 194, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(126, 87, 194, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(126, 87, 194, 0); }
+        body {
+            background: linear-gradient(135deg, #0f0f1a 0%, #1b1128 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        .modal { 
-            position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; 
-            justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(6px);
+        #loading {
+            position: fixed; inset: 0; background: var(--space-dark);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 9999; transition: opacity 0.6s;
         }
-        .modal-box { background: white; padding: 30px; border-radius: 28px; width: 90%; max-width: 400px; }
-        .modal-box input, .modal-box textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #eee; border-radius: 12px; outline: none; }
+        .loader-orbit {
+            width: 80px; height: 80px;
+            border: 2px solid var(--herta-purple);
+            border-radius: 50%;
+            border-top-color: var(--ruan-mei-teal);
+            animation: spin 1s linear infinite;
+        }
+
+        .marquee-container {
+            background: rgba(125, 91, 166, 0.15);
+            padding: 8px 0; overflow: hidden; white-space: nowrap;
+            border-bottom: 1px solid var(--herta-purple);
+        }
+        .marquee-text {
+            display: inline-block; animation: scroll 25s linear infinite;
+            font-weight: 600; letter-spacing: 1.5px; color: var(--ruan-mei-teal);
+            text-transform: uppercase; font-size: 0.8rem;
+        }
+
+        .container { max-width: 1100px; margin: auto; padding: 20px; text-align: center; min-height: 80vh; }
+        .quote { font-style: italic; color: #888; margin: 15px 0 30px; font-size: 0.85rem; line-height: 1.5; }
+        
+        h2 { color: var(--ruan-mei-teal); margin-bottom: 25px; font-weight: 800; letter-spacing: 1px; }
+
+        .btn-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-top: 10px; }
+        .btn {
+            background: var(--glass); border: 1px solid rgba(125, 91, 166, 0.4);
+            padding: 20px; color: white; cursor: pointer; border-radius: 12px;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(8px); font-weight: 600;
+        }
+        .btn:hover { background: var(--herta-purple); transform: translateY(-5px); border-color: var(--ruan-mei-teal); }
+
+        .card-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 30px; }
+        .card {
+            background: rgba(255, 255, 255, 0.03); border-radius: 16px; overflow: hidden;
+            border: 1px solid rgba(168, 218, 220, 0.1); transition: 0.3s;
+        }
+        .card:hover { border-color: var(--ruan-mei-teal); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
+        .carousel { position: relative; height: 220px; background: #000; overflow: hidden; }
+        .carousel img { width: 100%; height: 100%; object-fit: cover; cursor: zoom-in; }
+        .carousel-btn {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            background: rgba(0,0,0,0.6); color: white; border: none; 
+            width: 35px; height: 35px; cursor: pointer; border-radius: 50%;
+        }
+
+        .card-content { padding: 18px; text-align: left; }
+        .date-tag { font-size: 0.75rem; color: var(--ruan-mei-teal); background: rgba(168, 218, 220, 0.1); padding: 2px 8px; border-radius: 4px; }
+        .pdf-btn {
+            display: inline-block; margin-top: 12px; padding: 10px 18px;
+            background: #ff4d4d; color: white; text-decoration: none; border-radius: 8px; 
+            font-size: 0.8rem; font-weight: bold; transition: 0.3s;
+        }
+        .pdf-btn:hover { background: #ff79c6; transform: scale(1.05); }
+
+        .floating-controls { position: fixed; bottom: 25px; right: 25px; display: flex; flex-direction: column; gap: 15px; z-index: 1000; }
+        .float-btn {
+            width: 55px; height: 55px; border-radius: 50%; border: none;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.4); transition: 0.3s; font-size: 1.2rem;
+        }
+        .btn-music { background: var(--herta-purple); color: white; }
+        .btn-comment { background: var(--ruan-mei-teal); animation: blink 2s infinite; color: #12121e; }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes scroll { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
+        @keyframes blink { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.1); box-shadow: 0 0 25px var(--ruan-mei-teal); } }
+
+        #overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
+            display: none; justify-content: center; align-items: center; z-index: 10000; cursor: zoom-out;
+        }
+        #overlay img { max-width: 95%; max-height: 95%; border-radius: 8px; }
+
+        .hidden { display: none; }
+        .back-btn { background: none; border: none; color: var(--ruan-mei-teal); cursor: pointer; margin-bottom: 15px; display: flex; align-items: center; gap: 5px; }
     </style>
 </head>
 <body>
 
-    <audio id="music-pasilyo" src="pasilyo.mp3" loop></audio>
+<div id="loading">
+    <div class="loader-orbit"></div>
+    <p style="margin-top: 20px; color: var(--ruan-mei-teal); letter-spacing: 2px; font-size: 0.7rem;">LOADING DATA SIMULATION...</p>
+</div>
 
-    <div id="zoom-overlay" onclick="closeZoom()">
-        <img id="zoom-img" src="" alt="Full Screen">
+<div class="marquee-container" id="marqueeBox">
+    <div class="marquee-text" id="runningText">
+        BIOLOGI — KIMIA — FISIKA — GENIUS SOCIETY — KNOWLEDGE IS THE ONLY CURRENCY — HERTA — RUAN MEI — BIOLOGI — KIMIA — FISIKA
     </div>
+</div>
 
-    <div class="marquee-wrapper">
-        <div class="marquee-text" id="marquee">Selamat datang di sistem arsip IPA. Silakan pilih kategori penelitian.</div>
-    </div>
+<div class="container">
+    <h1 style="margin-top: 20px; font-weight: 800; font-size: 2.5rem;"><span style="color:var(--ruan-mei-teal)">IPA</span><span style="color:var(--herta-purple)"> ARCHIVE</span></h1>
+    <div class="quote" id="dynamicQuote">"I have no interest in ordinary things. Show me the results of your 'hard work'." - Herta</div>
 
-    <section id="step-1" class="section active">
-        <h1 style="color:var(--primary)">Arsip Penelitian IPA</h1>
+    <!-- Step 1: Kelas -->
+    <div id="step-kelas">
+        <h2>SELECT GRADE</h2>
         <div class="btn-grid">
-            <button class="nav-btn" onclick="chooseMapel('Biologi')">🧬 Biologi</button>
-            <button class="nav-btn" onclick="chooseMapel('Fisika')">⚡ Fisika</button>
-            <button class="nav-btn" onclick="chooseMapel('Kimia')">🧪 Kimia</button>
-        </div>
-    </section>
-
-    <section id="step-2" class="section">
-        <h1 id="header-mapel" style="color:var(--primary)">Pilih Tingkatan</h1>
-        <div class="btn-grid">
-            <button class="nav-btn" onclick="setKelas('10')">Level 10</button>
-            <button class="nav-btn" onclick="setKelas('11')">Level 11</button>
-            <button class="nav-btn" onclick="setKelas('12')">Level 12</button>
-        </div>
-    </section>
-
-    <section id="step-3" class="section">
-        <h1 style="color:var(--primary)">Pilih Semester</h1>
-        <div class="btn-grid">
-            <button class="nav-btn" onclick="render('1')">Semester 1</button>
-            <button class="nav-btn" onclick="render('2')">Semester 2</button>
-        </div>
-    </section>
-
-    <section id="step-4" class="section" style="justify-content: flex-start;">
-        <h1 id="header-final" style="margin-top: 40px; color:var(--primary)">Arsip Data</h1>
-        <div class="grid" id="display-grid"></div>
-        <button class="nav-btn" onclick="location.reload()" style="margin:40px 0;">Kembali ke Awal</button>
-    </section>
-
-    <button class="fab" onclick="toggleModal(true)">💬</button>
-
-    <div id="fb-modal" class="modal">
-        <div class="modal-box">
-            <h3 style="color:var(--primary)">Saran & Masukan</h3>
-            <input type="text" id="nama" placeholder="Nama Lengkap">
-            <textarea id="pesan" rows="4" placeholder="Masukan Anda..."></textarea>
-            <button onclick="sendFeedback()" id="btn-submit" style="width:100%; padding:14px; background:var(--primary); color:white; border:none; border-radius:12px; cursor:pointer;">Kirim</button>
-            <center><p onclick="toggleModal(false)" style="color:red; cursor:pointer; margin-top:15px;">Tutup</p></center>
+            <button class="btn" onclick="selectKelas('10')">CLASS 10</button>
+            <button class="btn" onclick="selectKelas('11')">CLASS 11</button>
+            <button class="btn" onclick="selectKelas('12')">CLASS 12</button>
         </div>
     </div>
 
-    <script>
-        const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRyJ4VihwGxpbpxQfSDKMb5AiPVmY1-wFviOWyEjfsuljcLPXUypWMNVDakdmM-58m31gNBNydwGSEe/pub?output=csv";
-        let rawData = [];
-        let state = { mapel: '', kelas: '' };
-        const myMusic = document.getElementById('music-pasilyo');
+    <!-- Step 2: Mapel -->
+    <div id="step-mapel" class="hidden">
+        <button class="back-btn" onclick="goBack('step-kelas')">← BACK</button>
+        <h2>RESEARCH SUBJECT</h2>
+        <div class="btn-grid">
+            <button class="btn" onclick="selectMapel('Biologi')">BIOLOGI</button>
+            <button class="btn" onclick="selectMapel('Kimia')">KIMIA</button>
+            <button class="btn" onclick="selectMapel('Fisika')">FISIKA</button>
+        </div>
+    </div>
 
-        async function init() {
-            try {
-                const res = await fetch(csvUrl);
-                const text = await res.text();
-                const rows = text.split('\n').slice(1);
-                rawData = rows.map(row => {
-                    const c = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                    return { 
-                        kelas: c[0]?.replace(/"/g, '').trim(), 
-                        mapel: c[1]?.replace(/"/g, '').trim(), 
-                        smt: c[2]?.replace(/"/g, '').trim(), 
-                        judul: c[3]?.replace(/"/g, '').trim(), 
-                        link: c[4]?.replace(/"/g, '').trim(), 
-                        desc: c[5]?.replace(/"/g, '').trim() 
-                    };
-                }).filter(x => x.judul);
-                document.getElementById('marquee').innerText = "Data berhasil dimuat. Pilih kategori untuk memulai.";
-            } catch (e) { document.getElementById('marquee').innerText = "Database Offline."; }
-        }
+    <!-- Step 3: Semester -->
+    <div id="step-semester" class="hidden">
+        <button class="back-btn" onclick="goBack('step-mapel')">← BACK</button>
+        <h2>TIME CYCLE</h2>
+        <div class="btn-grid">
+            <button class="btn" onclick="loadData('1')">SEMESTER 1</button>
+            <button class="btn" onclick="loadData('2')">SEMESTER 2</button>
+        </div>
+    </div>
 
-        function chooseMapel(m) { state.mapel = m; document.getElementById('header-mapel').innerText = m; nav(2); }
+    <!-- Step 4: Cards Display -->
+    <div id="display-area" class="hidden">
+        <button class="back-btn" onclick="goBack('step-semester')">← BACK TO SEMESTER</button>
+        <div class="card-container" id="cards-grid"></div>
+    </div>
+</div>
+
+<div class="floating-controls">
+    <button class="float-btn btn-music" onclick="toggleMusic()" id="musicToggle">▶</button>
+    <button class="float-btn btn-comment" onclick="openComment()">💬</button>
+</div>
+
+<div id="overlay" onclick="this.style.display='none'"><img id="overlayImg" src=""></div>
+
+<audio id="bgm" loop>
+    <source src="pasilyo.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+    let selection = { kelas: '', mapel: '', semester: '' };
+    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRyJ4VihwGxpbpxQfSDKMb5AiPVmY1-wFviOWyEjfsuljcLPXUypWMNVDakdmM-58m31gNBNydwGSEe/pub?output=csv';
+    const bgm = document.getElementById('bgm');
+    bgm.volume = 0.2;
+
+    window.onload = () => {
+        setTimeout(() => {
+            document.getElementById('loading').style.opacity = '0';
+            setTimeout(() => document.getElementById('loading').style.display = 'none', 600);
+        }, 1200);
+    };
+
+    function selectKelas(k) {
+        selection.kelas = k;
+        document.getElementById('step-kelas').classList.add('hidden');
+        document.getElementById('step-mapel').classList.remove('hidden');
+        document.getElementById('dynamicQuote').innerText = '"Everything is predetermined by life... or by me." - Ruan Mei';
+        bgm.play();
+        document.getElementById('musicToggle').innerText = '⏸';
+    }
+
+    function selectMapel(m) {
+        selection.mapel = m;
+        document.getElementById('step-mapel').classList.add('hidden');
+        document.getElementById('step-semester').classList.remove('hidden');
+        document.getElementById('runningText').innerText = `${m} DATA ACQUISITION — GRADE ${selection.kelas} — ACCESSING MEMORY BUBBLES — ${m}`;
+    }
+
+    function loadData(s) {
+        selection.semester = s;
+        document.getElementById('step-semester').classList.add('hidden');
+        document.getElementById('display-area').classList.remove('hidden');
         
-        // MUSIK DIMULAI DISINI
-        function setKelas(k) { 
-            state.kelas = k; 
-            myMusic.volume = 0.4;
-            myMusic.play().catch(e => console.log("User must interact first")); 
-            nav(3); 
+        Papa.parse(csvUrl, {
+            download: true,
+            header: true,
+            complete: function(results) {
+                renderCards(results.data);
+            }
+        });
+    }
+
+    function renderCards(data) {
+        const grid = document.getElementById('cards-grid');
+        grid.innerHTML = '';
+        
+        const filtered = data.filter(row => 
+            row.kelas == selection.kelas && 
+            row.mapel.trim().toLowerCase() == selection.mapel.toLowerCase() && 
+            row.semester == selection.semester
+        );
+
+        if(filtered.length === 0) {
+            grid.innerHTML = `<div style="grid-column: 1/-1; padding: 50px; color: #666;">Data tidak ditemukan dalam simulasi ini.</div>`;
+            return;
         }
 
-        function nav(s) { 
-            document.querySelectorAll('.section').forEach(x => x.classList.remove('active'));
-            document.getElementById('step-' + s).classList.add('active');
-            window.scrollTo(0,0);
-        }
+        filtered.forEach((item, index) => {
+            const photoList = item.foto.split(',');
+            const date = item.tanggal && item.tanggal.trim() !== "" ? item.tanggal : "N/A";
+            let description = item.deskripsi || "";
+            let actionBtn = "";
 
-        function render(s) {
-            const grid = document.getElementById('display-grid');
-            const filtered = rawData.filter(d => d.mapel === state.mapel && d.kelas === state.kelas && d.smt === s);
-            grid.innerHTML = filtered.length ? '' : '<p>Data kosong.</p>';
-            
-            filtered.forEach((item, idx) => {
-                const imgs = item.link.split(',').map(l => l.trim());
-                let sliderHtml = `<div class="slider-container">`;
-                if(imgs.length > 1) {
-                    sliderHtml += `<button class="slider-btn" style="left:5px" onclick="move(${idx},-1)">❮</button>
-                                   <button class="slider-btn" style="right:5px" onclick="move(${idx},1)">❯</button>
-                                   <div class="img-counter"><span id="c-${idx}">1</span>/${imgs.length}</div>`;
+            // PDF Logic
+            if (description.toLowerCase().includes('.pdf')) {
+                const urlMatch = description.match(/https?:\/\/[^\s]+/);
+                if (urlMatch) {
+                    actionBtn = `<a href="${urlMatch[0]}" target="_blank" class="pdf-btn">BUKA DOKUMEN</a>`;
+                    description = description.replace(urlMatch[0], "");
                 }
-                sliderHtml += `<div class="slider-wrapper" id="sw-${idx}">`;
-                imgs.forEach(url => { 
-                    sliderHtml += `<img src="${url}" onclick="openZoom('${url}')" onerror="this.src='https://via.placeholder.com/400x230?text=Error'">`; 
-                });
-                sliderHtml += `</div></div>`;
+            }
 
-                grid.innerHTML += `
-                    <div class="card">${sliderHtml}<div class="card-body"><b>${item.judul}</b><p style="font-size:0.85rem">${item.desc}</p></div></div>`;
-            });
-            nav(4);
-        }
+            const card = document.createElement('div');
+            card.className = 'card';
+            const carouselId = `carousel-${index}`;
 
-        let slidePos = {};
-        function move(idx, dir) {
-            const el = document.getElementById(`sw-${idx}`);
-            const total = el.querySelectorAll('img').length;
-            slidePos[idx] = ((slidePos[idx] || 0) + dir + total) % total;
-            el.style.transform = `translateX(-${slidePos[idx] * 100}%)`;
-            document.getElementById(`c-${idx}`).innerText = slidePos[idx] + 1;
-        }
+            card.innerHTML = `
+                <div class="carousel" id="${carouselId}">
+                    <img src="${photoList[0]}" onclick="viewFull('${photoList[0]}')">
+                    ${photoList.length > 1 ? `
+                        <button class="carousel-btn" style="left:5px" onclick="moveCarousel('${carouselId}', '${item.foto}', -1)">❮</button>
+                        <button class="carousel-btn" style="right:5px" onclick="moveCarousel('${carouselId}', '${item.foto}', 1)">❯</button>
+                    ` : ''}
+                </div>
+                <div class="card-content">
+                    <span class="date-tag">${date}</span>
+                    <h3 style="margin: 10px 0 5px; color: var(--herta-purple); font-size: 1.1rem;">${item.judul || 'Untitled Project'}</h3>
+                    <p style="font-size: 0.85rem; color: #bbb; line-height: 1.4;">${description}</p>
+                    ${actionBtn}
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
 
-        // ZOOM FUNCTIONS
-        function openZoom(src) {
-            const overlay = document.getElementById('zoom-overlay');
-            const img = document.getElementById('zoom-img');
-            img.src = src;
-            overlay.style.display = 'flex';
-        }
-        function closeZoom() { document.getElementById('zoom-overlay').style.display = 'none'; }
+    function moveCarousel(cid, photoStr, dir) {
+        const container = document.getElementById(cid);
+        const img = container.querySelector('img');
+        const photos = photoStr.split(',');
+        let currentSrc = img.src;
+        // Handle full URL vs relative URL issues by finding index correctly
+        let currentIdx = photos.findIndex(p => p.trim() === currentSrc || currentSrc.includes(p.trim()));
+        let nextIdx = (currentIdx + dir + photos.length) % photos.length;
+        img.src = photos[nextIdx].trim();
+    }
 
-        function toggleModal(s) { document.getElementById('fb-modal').style.display = s ? 'flex' : 'none'; }
+    function viewFull(src) {
+        const overlay = document.getElementById('overlay');
+        document.getElementById('overlayImg').src = src;
+        overlay.style.display = 'flex';
+    }
 
-        function sendFeedback() {
-            const name = document.getElementById('nama').value;
-            const msg = document.getElementById('pesan').value;
-            const url = `https://docs.google.com/forms/d/e/1FAIpQLSdrFxIC2b4ov1k5mJye8CVpKN4IsVP5RI1XQv-sAsO2pJ_pFQ/formResponse?entry.1364991538=${encodeURIComponent(name)}&entry.1865279409=${encodeURIComponent(msg)}&submit=Submit`;
-            fetch(url, { mode: 'no-cors' }).then(() => {
-                alert("Terkirim!");
-                toggleModal(false);
-            });
-        }
+    function goBack(id) {
+        document.querySelectorAll('.container > div:not(.quote)').forEach(div => div.classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
+    }
 
-        window.onload = init;
-    </script>
+    function toggleMusic() {
+        if (bgm.paused) { bgm.play(); document.getElementById('musicToggle').innerText = '⏸'; }
+        else { bgm.pause(); document.getElementById('musicToggle').innerText = '▶'; }
+    }
+
+    function openComment() {
+        // Pre-filled Google Form Link
+        const formLink = `https://docs.google.com/forms/d/e/1FAIpQLSc3EBonvoYp1r3EWmLQaghElqYEtamv4xAmghbGJN3bC-eLrQ/viewform?usp=pp_url&entry.1078328655=${selection.kelas}&entry.1470795916=${selection.mapel}&entry.1054739972=Semester+${selection.semester}`;
+        window.open(formLink, '_blank');
+    }
+</script>
 </body>
 </html>
